@@ -12,6 +12,8 @@ import 'package:test_jccapi/data/model/register_model.dart';
 import 'package:test_jccapi/data/network_core.dart';
 import 'package:test_jccapi/data/repository/repository.dart';
 
+import '../model/update_article_model.dart';
+
 class RepositoryImpl implements Repository {
   final network = Get.find<NetworkCore>();
 
@@ -54,10 +56,9 @@ class RepositoryImpl implements Repository {
         "content": content,
       });
 
-      if(image != null) {
-        formData.files.addAll([
-          MapEntry("image", await MultipartFile.fromFile(image.path))
-        ]);
+      if (image != null) {
+        formData.files.addAll(
+            [MapEntry("image", await MultipartFile.fromFile(image.path))]);
       }
 
       var response = await network.dio.post("/post",
@@ -66,8 +67,7 @@ class RepositoryImpl implements Repository {
             "Accept": "applicatin/json",
             "Authorization": "Bearer $token",
             "Content-Type": "multipart/form-data"
-          })
-      );
+          }));
       print(response.data);
       return CreateArticleModel.fromJson(response.data);
     } on DioError catch (e) {
@@ -121,7 +121,7 @@ class RepositoryImpl implements Repository {
 
   @override
   FutureOr<DeleteArticleModel?> deleteArticle(int id, String token) async {
-    try{
+    try {
       var response = await network.dio.delete("/post/$id",
           options: Options(headers: {
             "Accept": "application/json",
@@ -129,14 +129,15 @@ class RepositoryImpl implements Repository {
           }));
 
       return DeleteArticleModel.fromJson(response.data);
-    }on DioError catch(e){
+    } on DioError catch (e) {
       print(e.response?.data);
       return DeleteArticleModel.fromJson(e.response?.data);
     }
   }
 
   @override
-  FutureOr<CreateArticleModel?> postUpdateArticle(int id, String title, String content, File? image, String token) async {
+  FutureOr<UpdateArticleModel?> postUpdateArticle(
+      int id, String title, String content, File? image, String token) async {
     try {
       var formData = FormData.fromMap({
         "title": title,
@@ -155,10 +156,10 @@ class RepositoryImpl implements Repository {
             "Accept": "application/json",
             "Content-Type": "multipart/form-data"
           }));
-      return CreateArticleModel.fromJson(response.data);
-    } on DioError catch(e){
+      return UpdateArticleModel.fromJson(response.data);
+    } on DioError catch (e) {
       print(e.response?.data);
-      return CreateArticleModel.fromJson(e.response?.data);
+      return UpdateArticleModel.fromJson(e.response?.data);
     }
   }
 }
